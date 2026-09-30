@@ -46,3 +46,7 @@ python -m unimate_mlx.character \
 `scripts/make_test_rig_61.py` created an actionless 61-bone, four-branch skinned GLB. It completed preprocessing, FLAN-T5 conditioning, MLX inference, GLB/FBX export, and reimport with all 61 bones. Its full-width MLX velocity differed from PyTorch by at most `8.2e-6`. A 62-bone control GLB was rejected after preprocessing with a clear checkpoint-limit error before text encoding.
 
 Next quality work should focus on stance-aware foot locking or contact constraints, plus review of multiple generated candidates. Adjusting root height alone cannot fix the low near-ground foot fraction or foot sliding.
+
+## Independent rig checks
+
+The [free rig set](FREE_RIGS.md) confirms the quadruped quality gap extends beyond the UniMate demo. Khronos Fox and CC0 Quaternius Wolf/Horse all generated structurally valid animations with FP32 PyTorch parity, but their gait and posture differ visibly from the authored Walk cycles. CesiumMan provided a humanoid control whose generated walk was recognizable though subdued. The Wolf also exposed a separate asset distortion: official canonicalization created a stationary `neutral_bone` with 386 weighted vertices. As the body moved, those vertices stretched into long trails. The pipeline now reassigns such weights to nearby retained bones and removes `neutral_bone` before export. On Wolf, the generated motion tensor remained identical while mesh extent stayed near 2.1 units at frames 1, 30 and 60, instead of growing to about 12 units.

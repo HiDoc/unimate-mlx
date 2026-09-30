@@ -113,6 +113,8 @@ The one-command path was tested on the public Khronos `RiggedFigure.glb` with Bl
 
 The broader [character compatibility audit](COMPATIBILITY.md) covers eleven cases from 2 to 71 joints, including actionless rigs and both checkpoint boundaries. All eleven passed artifact and same-input FP32 PyTorch versus MLX velocity checks; all 22 exported GLB/FBX files reimported in Blender 5.2. The [Go2 visual-quality investigation](QUALITY.md) explains why a structurally valid animation can still have an unnatural gait.
 
+An additional [free rig quality set](FREE_RIGS.md) includes Khronos Fox and CesiumMan plus CC0 Quaternius Wolf and Horse. Those four independent assets passed export and parity checks, and exposed a synthetic neutral-bone skinning bug that is now repaired automatically. Their visual gait quality still varies.
+
 The benchmark script records SoC, RAM, precision, frame and joint counts, sampling grid, latency and peak MLX allocator memory. Its measurements exclude T5 encoding and Blender preprocessing/export.
 
 FP16 fixed-grid sampling is experimental. It reduced one 60-frame, 50-point Euler run from 20.7 s to 18.9 s and peak MLX memory from 1.80 GB to 1.28 GB. The maximum denoiser velocity difference versus PyTorch MPS is about `3.9e-3` at 60 frames. Adaptive sampling currently requires FP32.

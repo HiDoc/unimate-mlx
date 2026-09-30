@@ -1299,6 +1299,8 @@ Status on 2026-09-30: the hybrid pipeline runs on public biped and Go2 quadruped
 - [x] FBX export, verified on RiggedFigure
 - [x] Broader character and rig compatibility testing: eleven cases, 2–71 joints across preview and v2; all GLB/FBX exports reimported
 - [x] Stress and visual-quality testing: preview 61/62 and v2 71/72 joint boundaries, Go2 render and gait metrics
+- [x] Independent freely licensed rig quality checks: Fox, CesiumMan, Quaternius Wolf and Horse; see FREE_RIGS.md
+- [x] Rebind synthetic `neutral_bone` weights before animation export when official preprocessing leaves stationary weighted vertices
 - [ ] Improve quadruped foot contact and reduce sliding in generated motion; see QUALITY.md
 
 ## Phase 8 — Pure MLX
