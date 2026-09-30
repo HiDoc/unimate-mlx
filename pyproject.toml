@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "unimate-mlx"
+version = "0.1.0"
+description = "An Apple Silicon MLX port of the UniMate motion denoiser"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "mlx>=0.25",
+  "numpy>=1.26",
+  "safetensors>=0.4",
+]
+
+[project.optional-dependencies]
+reference = ["torch>=2.5", "torch-geometric>=2.6", "torchdiffeq>=0.2.5", "einops>=0.8", "transformers>=4.45", "sentencepiece>=0.2"]
+test = ["pytest>=8"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["unimate_mlx"]
