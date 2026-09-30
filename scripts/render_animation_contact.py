@@ -83,6 +83,17 @@ scene.world.color = (0.11, 0.12, 0.14)
 
 for frame in frames:
     center, extent = frame_bounds(frame)
+    bone_points = [
+        obj.matrix_world @ bone.head
+        for obj in scene.objects if obj.type == "ARMATURE"
+        for bone in obj.pose.bones
+    ]
+    bone_extent = max(
+        (max(point[axis] for point in bone_points) - min(point[axis] for point in bone_points)
+         for axis in range(3)),
+        default=0,
+    )
+    print("AUDIT_BOUNDS", frame, "mesh", round(extent, 4), "bones", round(bone_extent, 4), flush=True)
     camera.location = center + Vector((extent * 1.8, -extent * 2.5, extent * 1.35))
     direction = center - camera.location
     camera.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
