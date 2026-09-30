@@ -1,7 +1,7 @@
 import json
 import struct
 
-from unimate_mlx.asset_facing import infer_front_hip_pair
+from unimate_mlx.asset_facing import infer_front_hip_pair, skin_joint_names
 
 
 def test_infers_named_front_hip_pair_only_from_skin_joints(tmp_path):
@@ -20,5 +20,5 @@ def test_infers_named_front_hip_pair_only_from_skin_joints(tmp_path):
         + struct.pack("<I4s", len(payload), b"JSON") + payload
     )
     assert infer_front_hip_pair(path) == ("FR_hip", "FL_hip")
+    assert skin_joint_names(path) == {"base", "FR_hip", "FL_hip"}
     assert infer_front_hip_pair(tmp_path / "robot.fbx") is None
-

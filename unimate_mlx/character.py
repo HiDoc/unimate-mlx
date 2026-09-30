@@ -124,10 +124,11 @@ def main() -> int:
 
         if "neutral_bone" in skin_joint_names(canonical):
             repaired = preprocessed / f"{character.stem}_canonical_repaired.glb"
-            if not repaired.is_file() or repaired.stat().st_mtime < canonical.stat().st_mtime:
+            repair_script = Path(__file__).with_name("repair_neutral_skin.py")
+            if not repaired.is_file() or repaired.stat().st_mtime < max(canonical.stat().st_mtime, repair_script.stat().st_mtime):
                 run([
                     args.blender, "-b", "--python-exit-code", "1",
-                    "-P", str(Path(__file__).with_name("repair_neutral_skin.py")), "--",
+                    "-P", str(repair_script), "--",
                     str(canonical), str(repaired),
                 ])
             if "neutral_bone" in skin_joint_names(repaired):
