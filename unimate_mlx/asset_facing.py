@@ -14,11 +14,11 @@ _FRONT_HIP_PAIRS = (
 )
 
 
-def infer_front_hip_pair(path: str | Path) -> tuple[str, str] | None:
-    """Return an unambiguous front right/left hip pair from a rigged GLB."""
+def skin_joint_names(path: str | Path) -> set[str]:
+    """Read skin joint names from a GLB without loading geometry or animation."""
     path = Path(path)
     if path.suffix.lower() != ".glb":
-        return None
+        return set()
     with path.open("rb") as stream:
         header = stream.read(12)
         if len(header) != 12:
@@ -35,6 +35,11 @@ def infer_front_hip_pair(path: str | Path) -> tuple[str, str] | None:
         document = json.loads(stream.read(length))
     nodes = document.get("nodes", [])
     joint_indices = {index for skin in document.get("skins", []) for index in skin.get("joints", [])}
-    names = {nodes[index].get("name") for index in joint_indices if 0 <= index < len(nodes)}
+    return {nodes[index].get("name") for index in joint_indices if 0 <= index < len(nodes) and nodes[index].get("name")}
+
+
+def infer_front_hip_pair(path: str | Path) -> tuple[str, str] | None:
+    """Return an unambiguous front right/left hip pair from a rigged GLB."""
+    names = skin_joint_names(path)
     matches = [pair for pair in _FRONT_HIP_PAIRS if pair[0] in names and pair[1] in names]
     return matches[0] if len(matches) == 1 else None

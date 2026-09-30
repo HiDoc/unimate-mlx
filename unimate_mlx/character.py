@@ -32,6 +32,8 @@ def main() -> int:
     parser.add_argument("--face-l", help="raw left hip bone name for facing canonicalization")
     parser.add_argument("--auto-facing", action=argparse.BooleanOptionalAction, default=True,
                         help="infer a front right/left hip pair when the GLB has unambiguous names")
+    parser.add_argument("--repair-neutral-skin", action=argparse.BooleanOptionalAction, default=True,
+                        help="rebind vertices from a synthetic neutral_bone before animation")
     parser.add_argument("--steps", type=int, default=50)
     parser.add_argument("--solver", choices=("euler", "rk4", "dopri5"), default="dopri5")
     parser.add_argument("--rtol", type=float, default=1e-3)
@@ -117,6 +119,21 @@ def main() -> int:
     joint_count = len(load_topology(topology)["parents"])
     if joint_count > max_joints:
         parser.error(f"character has {joint_count} joints after preprocessing; this EMA checkpoint supports at most {max_joints}")
+    if args.repair_neutral_skin:
+        from .asset_facing import skin_joint_names
+
+        if "neutral_bone" in skin_joint_names(canonical):
+            repaired = preprocessed / f"{character.stem}_canonical_repaired.glb"
+            if not repaired.is_file() or repaired.stat().st_mtime < canonical.stat().st_mtime:
+                run([
+                    args.blender, "-b", "--python-exit-code", "1",
+                    "-P", str(Path(__file__).with_name("repair_neutral_skin.py")), "--",
+                    str(canonical), str(repaired),
+                ])
+            if "neutral_bone" in skin_joint_names(repaired):
+                raise RuntimeError("neutral_bone remains in repaired canonical GLB")
+            print(f"Using repaired skin: {repaired}", flush=True)
+            canonical = repaired
 
     from .prepare import main as prepare_main
     from .generate import main as generate_main
@@ -175,6 +192,8 @@ def main() -> int:
         "seed": args.seed if not args.initial_noise else None,
         "initial_noise": str(args.initial_noise.resolve()) if args.initial_noise else None,
         "trim_joints": args.trim_joints,
+        "repair_neutral_skin": args.repair_neutral_skin,
+        "canonical_asset": str(canonical.relative_to(output)),
         "dtype": args.dtype,
     }
     (output / "run.json").write_text(json.dumps(manifest, indent=2) + "\n")
