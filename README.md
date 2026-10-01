@@ -13,13 +13,28 @@ Use an Apple Silicon Mac with Python 3.13 and Blender 5.2. The Blender 5.2 adapt
 ```sh
 python3.13 -m venv .venv
 source .venv/bin/activate
-pip install -e '.[reference,test]'
+pip install -e '.[reference,studio,test]'
 pip install 'setuptools<81' loguru matplotlib imageio tqdm
 pip install --no-build-isolation 'Motion @ git+https://github.com/inbar-2344/Motion.git'
 git clone https://github.com/Friedrich-M/UniMate.git /path/to/UniMate
 ```
 
 Download `model_ema.safetensors`, `config.json`, and `dataset_stats.npy` from the [weights repository](https://huggingface.co/tarn59/UniMate-Weights/tree/main) into `weights/`. The checkpoint is about 283 MiB. The `weights/` and `outputs/` directories are excluded from git.
+
+## UniMate Studio
+
+The local Vue/TypeScript studio accepts a rigged GLB, an ordered queue of preset or written motion prompts, and generates one 60-frame (2-second) animation per prompt. It previews each finished clip and exports both individual GLB/FBX files and one chained GLB/FBX sequence. The 3D viewer supports orbiting, playback, and scrubbing. Progress and remaining time update as clips finish. Use Node.js 22 or newer for the frontend tests.
+
+Install the frontend once, then start the API and Vite together:
+
+```sh
+npm --prefix web install
+make
+```
+
+Open `http://127.0.0.1:5173`. `make` (or `make studio`) finds the official source at `../UniMate` or `/private/tmp/unimate-reference`. If it lives elsewhere, run `make UNIMATE_REFERENCE_DIR=/path/to/UniMate`. Ctrl-C stops both processes. The API listens on `127.0.0.1:8000` and Vite proxies `/api` there. For a built UI served by the Python API, run `make studio-build` before starting `python -m unimate_mlx.studio_api`.
+
+The **Fast** mode uses a 24-point RK4 sampler with valid-joint trimming. On the 17-joint Go2 test rig, sampling took 10.6 seconds on Apple M4; the reference adaptive mode took 58.8 seconds. Those are sampling measurements, so first-run text encoding, Blender preprocessing, and export add time. The UI estimates the full job and adjusts after completed clips. For example, a two-clip 2-joint RiggedSimple run took 46 seconds overall, with roughly 1 second of sampling per clip. Sequence blending keeps 60 frames per clip; a two-clip run produced one 120-frame GLB animation. Use `make studio-test` for the focused backend and frontend unit tests.
 
 For v2, download `config.json`, `dataset_stats.npy`, and `checkpoints/checkpoint_step_100000.pt` from the [official recommended checkpoint](https://huggingface.co/Linzhan/UniMate/tree/main/unimate_uniml3d_f60_v2). Extract its EMA into `weights/v2/`:
 
