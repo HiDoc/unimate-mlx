@@ -8,3 +8,5 @@ outputs/
 *.glb
 *.fbx
 
+node_modules/
+dist/

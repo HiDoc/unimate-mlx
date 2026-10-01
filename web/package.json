@@ -1,0 +1,27 @@
+{
+  "name": "unimate-studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "typecheck": "vue-tsc --noEmit",
+    "test": "node --experimental-strip-types --test src/studio-utils.test.ts"
+  },
+  "dependencies": {
+    "@fontsource/dm-sans": "^5.2.6",
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "lucide-vue-next": "^0.468.0",
+    "three": "^0.180.0",
+    "vue": "^3.5.18"
+  },
+  "devDependencies": {
+    "@types/three": "^0.180.0",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.0",
+    "vue-tsc": "^3.1.0"
+  }
+}
